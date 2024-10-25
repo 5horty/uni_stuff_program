@@ -78,7 +78,17 @@ def make_inialism():
     print(firstlett)
 
 
-make_inialism()
+def file_in_caps():
+    filename = input("enter a file name ")
+    with open(filename,"r") as file:
+        lines = file.readlines()
+        content = ""
+        for line in lines:
+            content+=line
+        content_up = content.upper()
+        print(content_up)
+
+file_in_caps()
 
 
 
