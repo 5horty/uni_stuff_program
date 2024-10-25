@@ -26,4 +26,9 @@ def generate_surnameemail():
     email = surname + "." + forename +"."+year+email_back
     print(email)
 
-generate_surnameemail()
+def grade_test():
+    grades = "FFFFCCBBAAA"
+    grade = int(input("pls enter a a number 1-10 "))
+    gradeletter = grades[grade]
+    print(f"your letter grade is {gradeletter} and number is {grade}")
+grade_test()
