@@ -54,7 +54,19 @@ def sing_a_song():
         user_wordpl.strip("\n")
         print(user_wordpl) 
 
-sing_a_song()
+def exchange_table():
+    pound = 1.17
+    print("euros\t | \t pounds")
+    print("-"*20)
+    for i in range(21):
+        if i != 0:
+            poval = i / pound
+            povalreal = round(poval,2)
+        else:
+            povalreal = i
+        print(f"{i:> 5} euros \t | \t pounds {povalreal:> 6.2f}") 
 
+
+exchange_table()
 
 
