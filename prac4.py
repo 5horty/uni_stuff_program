@@ -43,9 +43,18 @@ def graphics_letters():
         text.draw(win)
     win.get_mouse()
     win.close()
-graphics_letters()
 
+def sing_a_song():
+    user_word = input("enter a word pls ")
+    user_lines = int(input("enter how many lines "))
+    user_wordperLine = int(input("enter how many words peer line"))
+    user_wordsp = user_word + " "
+    for i in range(user_lines):
+        user_wordpl = user_wordsp * user_wordperLine + "\n" 
+        user_wordpl.strip("\n")
+        print(user_wordpl) 
 
+sing_a_song()
 
 
 
