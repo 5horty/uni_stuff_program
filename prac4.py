@@ -1,5 +1,6 @@
-import os
+import os 
 from graphix import Window,Text,Point
+
 def personal_greeting():
     name = input("please enter your name ")
     print(f"Hello {name}, nice to see you!")
@@ -67,6 +68,17 @@ def exchange_table():
         print(f"{i:> 5} euros \t | \t pounds {povalreal:> 6.2f}") 
 
 
-exchange_table()
+def make_inialism():
+    user_input = input("enter a phrase ")
+    words = user_input.split()
+    firstlet =""
+    for word in words:
+        firstlet += word[0]
+    firstlett = firstlet.upper()
+    print(firstlett)
+
+
+make_inialism()
+
 
 
