@@ -1,4 +1,5 @@
 import os
+from graphix import Window,Text,Point
 def personal_greeting():
     name = input("please enter your name ")
     print(f"Hello {name}, nice to see you!")
@@ -31,4 +32,20 @@ def grade_test():
     grade = int(input("pls enter a a number 1-10 "))
     gradeletter = grades[grade]
     print(f"your letter grade is {gradeletter} and number is {grade}")
-grade_test()
+
+def graphics_letters():
+    user_word = input("enter a word ")
+    win = Window()
+    for i in user_word:
+        click=win.get_mouse()
+        text = Text(Point(click.x,click.y),"")
+        text.text = i
+        text.draw(win)
+    win.get_mouse()
+    win.close()
+graphics_letters()
+
+
+
+
+
