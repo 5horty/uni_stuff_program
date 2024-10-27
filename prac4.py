@@ -88,7 +88,20 @@ def file_in_caps():
         content_up = content.upper()
         print(content_up)
 
-file_in_caps()
+def total_spending():
+    total = 0.0
+    with open("spending.txt","r") as file:
+        for line in file:
+            parts = line.strip()
+            if len(parts) > 1:
+                amount = float(parts.strip())
+                total += amount
+        print(total)
 
-
+def test():
+    list1=[]
+    for i in range(100):
+        list1.append(i)
+    print(list1)
+test()
 
