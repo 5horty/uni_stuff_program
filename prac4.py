@@ -1,5 +1,5 @@
 import os 
-from graphix import Window,Text,Point
+from graphix import Window,Text,Point,Entry,Rectangle
 
 def personal_greeting():
     name = input("please enter your name ")
@@ -103,5 +103,54 @@ def test():
     for i in range(100):
         list1.append(i)
     print(list1)
-test()
+def testtree():
+    for i in range(10):
+        print(i)
+
+def name22():
+    win = Window("name",400,400)
+    input_box = Entry(Point(200, 100),10)
+    input_box.draw(win)
+    message = Text(Point(200, 50),"hello")
+    message.draw(win)
+    win.get_mouse()
+    win.close()
+
+
+def name_to_number():
+    name = input("enter a name ")
+    name = name.lower()
+    total = 0
+    for char in name:
+        total += ord(char)-96
+    print(total)
+def rainfall_chart():
+    with open("rainfall.txt","r") as file2:
+        lines = file2.readlines()
+        for line in lines:
+            city, number = line.split()
+            ast = "*" * int(number)
+            print(f"{city} {ast}")
+            
+def graph_ver():
+    with open("rainfall.txt","r") as file:
+        lines = file.readlines()
+        win = Window("test",800,800)
+        for line in lines:
+            city , number =line.split()
+            ydiff = 10
+            pointx = 100
+            pointy = 100
+            text = Text(Point(pointx,pointy),city)
+            text.draw(win)
+            recx = 10 * int(number)
+            rect =Rectangle(Point(120,90),Point(recx,110))
+            rect.draw(win)
+            win.get_mouse()
+            win.close()
+
+
+
+
+
 
