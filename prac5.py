@@ -1,5 +1,5 @@
 import math
-from graphix import Window, Circle, Point
+from graphix import Window, Circle, Point, Entry, Text
 
 
 def greet(name):
@@ -132,6 +132,128 @@ def draw_pair_of_brown_eyes():
     draw_brown_eye(win,cent_eye_one,100)
     cent_eye_two = Point(300,200)
     draw_brown_eye(win,cent_eye_two,100)
+    win.get_mouse()
+    win.close()
+
+
+def distance_between_points(p1,p2):
+    return ((p2.x-p1.x)**2 + (p2.y-p1.y)**2)**0.5
+
+
+def distance_calc():
+    win = Window()
+
+    text = Text(Point(200,30),"click 2 points")
+    text.draw(win)
+    
+    point1 = win.get_mouse()
+    point2 = win.get_mouse()
+
+    diff=round(distance_between_points(point1,point2),2)
+    diff = str(diff)
+    text.text = diff
+
+
+    win.get_mouse()
+    win.close()
+
+
+def draw_blocks(one,two,three,four,five):
+    for i in range(five):
+        line = ""
+
+        line += " " * one
+
+        line += "*" * two
+
+        line += " " * three
+
+        line += "*" * four
+
+
+        print(line)
+
+
+
+
+
+
+def draw_letter_a():
+    draw_blocks(1,8,0,0,2)
+    draw_blocks(0,2,6,2,2)
+    draw_blocks(0,10,0,0,2)
+    draw_blocks(0,2,6,2,3)
+
+def draw_four_pairs_of_brown_eyes():
+    win = Window("",800,800)
+
+    click1 = win.get_mouse()
+    click2 = win.get_mouse()
+
+
+    rad = int(distance_between_points(click1,click2))
+
+
+    draw_brown_eye(win,click1,rad)
+    click1 = Point(click1.x + (rad*2),click1.y)
+    draw_brown_eye(win,click1,rad)
+
+    click3 = win.get_mouse()
+    click4 = win.get_mouse()
+
+    rad2 = int(distance_between_points(click3,click4))
+
+    draw_brown_eye(win,click3,rad2)
+    print(click3.x)
+    click3 = Point(click3.x + (rad2*2),click3.y)
+    print(click3.x)
+    draw_brown_eye(win,click3,rad2)
+
+    win.get_mouse()
+    win.close()
+
+
+def display_text_with_spaces(win,size,pos,text):
+    texts  = text.text
+    texts = texts.upper()
+    #numnew = size.text
+    #numnew = int(numnew)
+    numnew = size
+    newtext = ""
+    for char in texts:
+        newtext += char+ " "
+
+    textbox = Text(Point(pos.x,pos.y),"")
+    textbox.text = newtext
+    textbox.size = numnew
+    textbox.draw(win)
+
+def test43():
+    win = Window("",800,800)
+    
+    tezt = Entry(Point(200,200),10)
+    tezt.draw(win)
+    win.get_mouse()
+    num = Entry(Point(200,300),10)
+    num.draw(win)
+    posi = win.get_mouse()
+    display_text_with_spaces(win,num,posi,tezt)
+
+    win.get_mouse()
+    win.close()
+
+def construct_vision_chart():
+    win = Window("",800,700)
+    position = Point(400,100)
+    textsize = 30
+    for i in range(1,7,1):
+        text = Entry(Point(200,200),10)
+        text.draw(win)
+        win.get_mouse()
+        display_text_with_spaces(win,textsize,position,text)
+        position = Point(400,100+(100*i))
+        textsize -= 5
+
     win.get_mouse()
     win.close()
 
