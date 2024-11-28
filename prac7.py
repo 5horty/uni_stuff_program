@@ -1,4 +1,4 @@
-from graphix import Window,Circle,Rectangle,Point,Text,Entry,Polygon
+from graphix import Window,Circle,Rectangle,Line,Point,Text,Entry,Polygon
 from prac5 import distance_between_points,draw_brown_eye
 
 import time
@@ -147,6 +147,16 @@ def fahrenheit_to_celsius(f):
 def celsius_to_fahrenheit(c):
     return c * 9 / 5 + 32
 
+def temp_convert():
+    type = input("enter which way to convert f (for f to c) and c (for c to f) ")
+    while type:
+        if type.lower() == "f":
+            num = int(input("enter a number "))
+            print(fahrenheit_to_celsius(num))
+        elif type.lower() == "c":
+            num = int(input("enter a number "))
+            print(celsius_to_fahrenheit(num))
+        type = input("enter which way to convert f (for f to c) and c (for c to f) ") 
 
 
 def get_name():
@@ -213,4 +223,36 @@ def clickable_eye():
             win.close()
 
         
-
+def table_tennis():
+    win = Window()
+    play1 = 0
+    play2 = 0
+    flag = True
+    line = Line(Point(200,0),Point(200,400))
+    text1 = Text(Point(100,200),str(play1))
+    text2 = Text(Point(300,200),str(play2))
+    text1win = Text(Point(100,350),"")
+    text2win = Text(Point(300,350),"")
+    text1.draw(win)
+    text2.draw(win)
+    text1win.draw(win)
+    text2win.draw(win)
+    line.draw(win)
+    while flag:
+        click = win.get_mouse()
+        if click.x > 200:
+            play2 += 1
+            text2.text = str(play2)
+        else:
+            play1 +=1
+            text1.text = str(play1)
+        if play1 >= 11 and play1-play2 >= 2:
+            text1win.text = "winner"
+            flag = False
+        if play2 >= 11 and play2-play1 >= 2:
+            text2win.text = "winner"
+            flag = False
+        
+    win.get_mouse()
+    win.close()
+        
