@@ -1,7 +1,12 @@
 from graphix import Circle, Rectangle,Polygon,Text,Window, Point
 
 
-
+def test(win,p1):
+    br = Point(p1.x + 100,p1.x + 100)
+    rect = Rectangle(p1,br)
+    rect.outline_width = 5
+    rect.outline_colour = "black"
+    rect.draw(win)
 
 def rectangle(win,point1,point2,out_colur,colour):
     rect = Rectangle(point1,point2)
@@ -104,8 +109,16 @@ def check_keys(win,size):
                [br_x for br_x in range(100,size+100,100)],
                [tl_y for tl_y in range(0,size,100)],
                [br_y for br_y in range(100,size+100,100)]]
-    for i in range(len(co_ords[0])):
-        print(f"tl: {co_ords[0][i]},{co_ords[2][0]} - br: {co_ords[1][i]},{co_ords[3][0]}")
+    for y in range(len(co_ords[0])):
+        for x in range(len(co_ords[0])):
+            print(f"tl: {co_ords[0][x]},{co_ords[2][y]} - br: {co_ords[1][x]},{co_ords[3][y]}")
+
+    click = win.get_mouse()
+    xclick = (click.x//100)*100
+    yclick = (click.y//100)*100
+    test(win,Point(xclick,yclick))
+    #print(xclick,yclick)
+    
         
 
 
