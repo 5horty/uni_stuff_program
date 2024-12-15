@@ -23,7 +23,7 @@ def text(win,point,colour,size):
     texts.draw(win)
     return texts
 
-def undraw_blocks(patch_obj):
+def undraw_patches(patch_obj):
     if type(patch_obj) == list:
         for item in patch_obj:
             item.undraw()
@@ -101,7 +101,7 @@ def check_keys(win,grid,colour,colour2,colour3,size):
                 if (patch_x,patch_y)not in grid:
                     pass
                 else:
-                    undraw_blocks(grid[(patch_x,patch_y)])
+                    undraw_patches(grid[(patch_x,patch_y)])
                     grid.pop((patch_x,patch_y))
             case "1":
                 add_patch(win, grid, patch_x, patch_y, colour, pen_patch)
@@ -150,7 +150,7 @@ def check_keys(win,grid,colour,colour2,colour3,size):
                     grid.pop((patch_x,patch_y))
                     grid[(patch_x+100,patch_y)] = patch
             case "Escape":
-                undraw_blocks(border_grid[(patch_border_x,patch_border_y)])
+                undraw_patches(border_grid[(patch_border_x,patch_border_y)])
                 border_grid.pop((patch_border_x,patch_border_y))
                 click = win.get_mouse()
                 patch_border_x = click.x//100*100
@@ -178,39 +178,32 @@ def final_patch(win,colour,x,y):
     return patch_obj
 
 def check_vals():
-    val_sizes = ["5","7","9"]
-    val_colours = ["red","green","blue","magenta","orange","purple"]
+    val_sizes = ["5", "7", "9"]
+    val_colours = ["red", "green", "blue", "magenta", "orange", "purple"]
 
-    size = input("Enter a window size (5,7,9): ")
-    size = size.strip()
+    size = input("Enter a window size (5, 7, 9): ").strip()
     while size not in val_sizes:
-        size = input("Not valid size enter a valid size: ")
-        size = size.strip()
-    size = int(size)
-    size = size * 100
+        size = input("Not valid size! Enter a valid size (5, 7, 9): ").strip()
+    size = int(size) * 100
 
-    colour = input("""Enter the first colour 
-(red, greem, blue, magenta, orange, purple): """)
-    colour = colour.strip()
-    while colour.lower() not in val_colours or colour.isdigit():
-        colour = input("Not valid colour enter a valid colour: ")
-        colour = colour.strip()
-        
-    colour2 = input("Enter the second colour: ")
-    colour2 = colour2.strip()
-    while colour2.lower() not in val_colours or colour2.isdigit():
-        colour2 = input("Not valid colour enter a valid colour: ")
-        colour2 = colour2.strip()
-        
+    selected_colours = set()  # To track chosen colours
 
+    def get_unique_colour(prompt):
+        while True:
+            colour = input(prompt).strip().lower()
+            if colour in val_colours and colour not in selected_colours:
+                selected_colours.add(colour)
+                return colour
+            elif colour in selected_colours:
+                print(f"You've already chosen '{colour}'. Please pick a different colour.")
+            else:
+                print("Not a valid colour! Enter a valid colour.")
 
-    colour3 = input("Enter the third colour: ")
-    colour3 = colour3.strip()
-    while colour3.lower() not in val_colours or colour.isdigit():
-        colour3 = input("Not valid colour enter a valid colour: ")
-        colour3 = colour3.strip()
+    colour = get_unique_colour("Enter the first colour: ")
+    colour2 = get_unique_colour("Enter the second colour: ")
+    colour3 = get_unique_colour("Enter the third colour: ")
 
-    return size,colour,colour2,colour3
+    return size, colour, colour2, colour3
     
 
 def loops(win,size,colour,colour2,colour3):
