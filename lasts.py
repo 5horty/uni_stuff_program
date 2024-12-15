@@ -23,7 +23,7 @@ def text(win,point,colour,size):
     texts.draw(win)
     return texts
 
-def undraw_stuff(patch_obj):
+def undraw_blocks(patch_obj):
     if type(patch_obj) == list:
         for item in patch_obj:
             item.undraw()
@@ -36,7 +36,10 @@ def move_patch(patch_obj,x_amount,y_amount):
             item.move(x_amount,y_amount)
             time.sleep(0.01)
     else:
-        patch_obj.move(x_amount,y_amount)
+        patch_obj.move(x_amount//2,y_amount//2)
+        time.sleep(0.5)
+        patch_obj.move(x_amount//2,y_amount//2)
+
     return patch_obj 
     
 def box_click(win,tl_point):
@@ -69,6 +72,18 @@ def pen_patch(win,colour,x,y):
     return patch_obj
     
     #undraw_stuff(patch_obj)
+def add_patch(win, grid, patch_x, patch_y, colour, draw_func):
+    if (patch_x, patch_y) not in grid:
+        patch = draw_func(win, colour, patch_x, patch_y)
+        grid[(patch_x, patch_y)] = patch
+
+def add_block(win, grid,patch_x, patch_y, colour, draw_func):
+    if (patch_x, patch_y) not in grid:
+        tl = Point(patch_x,patch_y)
+        br = Point(patch_x+100,patch_y+100)
+        patch = draw_func(win,tl,br,colour,colour)
+        grid[(patch_x, patch_y)] = patch
+
     
 def check_keys(win,grid,colour,colour2,colour3,size):
     border_grid = {}
@@ -83,72 +98,59 @@ def check_keys(win,grid,colour,colour2,colour3,size):
         patch_y = click.y//100*100
         match key:
             case "x":
-                undraw_stuff(grid[(patch_x,patch_y)])
-                grid.pop((patch_x,patch_y))
+                if (patch_x,patch_y)not in grid:
+                    pass
+                else:
+                    undraw_blocks(grid[(patch_x,patch_y)])
+                    grid.pop((patch_x,patch_y))
             case "1":
-                if (patch_x,patch_y)not in grid:
-                    patch = pen_patch(win,colour,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour, pen_patch)
             case "2":
-                if (patch_x,patch_y)not in grid:
-                    patch = pen_patch(win,colour2,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour2, pen_patch)
             case "3":
-                if (patch_x,patch_y)not in grid:
-                    patch = pen_patch(win,colour3,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour3, pen_patch)
             case "4":
-                if (patch_x,patch_y)not in grid:
-                    patch = draw_final_patch(win,colour,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour, final_patch)
             case "5":
-                if (patch_x,patch_y)not in grid:
-                    patch = draw_final_patch(win,colour2,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour2, final_patch)
             case "6":
-                if (patch_x,patch_y)not in grid:
-                    patch = draw_final_patch(win,colour3,patch_x,patch_y)
-                    grid[(patch_x,patch_y)] = patch
+                add_patch(win, grid, patch_x, patch_y, colour3, final_patch)
             case "7":
-                if (patch_x,patch_y)not in grid:
-                    tl = Point(patch_x,patch_y)
-                    br = Point(patch_x+100,patch_y+100)
-                    patch = draw_final_patch(win,tl,br,colour,colour)
-                    grid[(patch_x,patch_y)] = patch
+                add_block(win,grid,patch_x,patch_y,colour,rectangle)
             case "8":
-                if (patch_x,patch_y)not in grid:
-                    tl = Point(patch_x,patch_y)
-                    br = Point(patch_x+100,patch_y+100)
-                    patch = rectangle(win,tl,br,colour2,colour2)
-                    grid[(patch_x,patch_y)] = patch
+                add_block(win,grid,patch_x,patch_y,colour2,rectangle)
             case "9":
-                if (patch_x,patch_y)not in grid:
-                    tl = Point(patch_x,patch_y)
-                    br = Point(patch_x+100,patch_y+100)
-                    patch = rectangle(win,tl,br,colour3,colour3)
-                    grid[(patch_x,patch_y)] = patch
+                add_block(win,grid,patch_x,patch_y,colour3,rectangle)
             case "Up":
-                if (patch_x,patch_y-100)not in grid and patch_y >= 0:
+                if (patch_x,patch_y-100)not in grid \
+                        and patch_y-100 >= 0 \
+                        and (patch_x,patch_y) in grid:
                     patch = move_patch(grid[(patch_x,patch_y)],0,-100)
                     grid.pop((patch_x,patch_y))
                     grid[(patch_x,patch_y-100)] = patch
             case "Down":
-                if (patch_x,patch_y+100)not in grid and patch_y+100 <= size:
+                if (patch_x,patch_y+100)not in grid \
+                        and patch_y+100 <= size \
+                        and (patch_x,patch_y) in grid:
                     patch = move_patch(grid[(patch_x,patch_y)],0,100)
                     grid.pop((patch_x,patch_y))
                     grid[(patch_x,patch_y+100)] = patch
             case "Left":
-                if (patch_x-100,patch_y)not in grid and patch_x >= 0:
+                if (patch_x-100,patch_y)not in grid \
+                        and patch_x-100 >= 0 \
+                        and (patch_x,patch_y) in grid:
                     patch = move_patch(grid[(patch_x,patch_y)],-100,0)
                     grid.pop((patch_x,patch_y))
                     grid[(patch_x-100,patch_y)] = patch
             case "Right":
-                if (patch_x+100,patch_y)not in grid and patch_x <= size :
+                if (patch_x+100,patch_y)not in grid \
+                        and patch_x+100 <= size \
+                        and (patch_x,patch_y) in grid:
                     patch = move_patch(grid[(patch_x,patch_y)],+100,0)
                     grid.pop((patch_x,patch_y))
                     grid[(patch_x+100,patch_y)] = patch
             case "Escape":
-                undraw_stuff(border_grid[(patch_border_x,patch_border_y)])
+                undraw_blocks(border_grid[(patch_border_x,patch_border_y)])
                 border_grid.pop((patch_border_x,patch_border_y))
                 click = win.get_mouse()
                 patch_border_x = click.x//100*100
@@ -160,7 +162,7 @@ def check_keys(win,grid,colour,colour2,colour3,size):
 
 
 
-def draw_final_patch(win,colour,x,y):
+def final_patch(win,colour,x,y):
     patch_obj = []
     start_x = x
     start_y = y
@@ -217,10 +219,8 @@ def loops(win,size,colour,colour2,colour3):
     
     for column in range(0,size,100):
         if (column//100)%2 == 0 and not column ==0 and not column == size-100:
-            patch = draw_final_patch(win,colour,size-100,column)
-            grid[(size-100,column)] = patch
-            patch = draw_final_patch(win,colour,0,column)
-            grid[(0,column)] =patch
+            add_patch(win, grid, size-100, column, colour, final_patch)
+            add_patch(win, grid, 0, column, colour, final_patch)
         if (column//100)%2 == 1:
             tl = Point(0,column)
             br = Point(100,column+100)
@@ -232,21 +232,18 @@ def loops(win,size,colour,colour2,colour3):
             grid[(tl.x,tl.y)] = patch
         for row in range(0,size,100):
             if column == 0 or column == size-100:
-                patch = draw_final_patch(win,colour,row,column)
-                grid[(row,column)] = patch
+                add_patch(win, grid, row, column, colour, final_patch)
             else:
                 if row >= 100 and row <= size-100:
                     tl = Point(row,column)
                     br = Point(row+100,column+100)
                     if (column//100)%2 == 0 and (column+row) <= size-100:
-                        patch = pen_patch(win,colour3,row,column)
-                        grid[(row,column)] = patch
+                        add_patch(win, grid, row, column, colour3, pen_patch)
                     if (column//100)%2 == 0  \
                             and (column+row) > size-100 \
                             and row+100 <= size-100:
+                        add_patch(win, grid, row, column, colour2, final_patch)
 
-                        patch = draw_final_patch(win,colour2,row,column)
-                        grid[(row,column)] = patch
                     if (column//100)%2 == 1 \
                             and (column+row) > size-100 \
                             and row+100 <= size-100:
@@ -258,14 +255,14 @@ def loops(win,size,colour,colour2,colour3):
                         grid[(row,column)] = patch
     
     check_keys(win,grid,colour,colour2,colour3,size)
-
+    
+    win.close()
 
 def main():
     size,colour,colour2,colour3 = check_vals()
     win = Window("",size,size)
     loops(win,size,colour,colour2,colour3)
 
-    win.close()
 
 main()
 
