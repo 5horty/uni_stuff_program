@@ -1,0 +1,103 @@
+set number
+set relativenumber
+set mouse=a
+set autoindent
+set smarttab
+set encoding=UTF-8
+set visualbell
+set scrolloff=5
+set clipboard=unnamedplus
+set cindent
+
+
+call plug#begin('~/.config/nvim/plugged')
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'https://github.com/scottmckendry/cyberdream.nvim'
+Plug 'https://github.com/slugbyte/lackluster.nvim'
+Plug 'https://github.com/tiagovla/tokyodark.nvim'
+Plug 'http://github.com/tpope/vim-surround' " Surrounding ysw)
+Plug 'https://github.com/tpope/vim-commentary' " For Commenting gcc & gc
+Plug 'https://github.com/preservim/nerdtree' ", {'on': 'NERDTreeToggle'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'https://github.com/ryanoasis/vim-devicons' " Developer Icons
+Plug 'https://github.com/preservim/tagbar', {'on': 'TagbarToggle'} " Tagbar for code navigation
+Plug 'https://github.com/junegunn/fzf.vim' " Fuzzy Finder, Needs Silversearcher-ag for :Ag
+Plug 'https://github.com/junegunn/fzf'
+Plug 'https://github.com/navarasu/onedark.nvim'
+Plug 'https://github.com/morhetz/gruvbox'
+Plug 'https://github.com/vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'https://github.com/mbbill/undotree'
+Plug 'https://github.com/lepture/vim-jinja'
+Plug 'https://github.com/tpope/vim-fugitive'
+Plug 'https://github.com/matze/vim-move'
+Plug 'voldikss/vim-floaterm'
+Plug 'vim-python/python-syntax'
+Plug 'alvan/vim-closetag'
+Plug 'catppuccin/nvim'
+Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
+Plug 'neovim/nvim-lspconfig'
+
+
+call plug#end()
+lua require("toggleterm").setup()
+
+lua << EOF
+require'nvim-treesitter.configs'.setup {
+	ensure_installed = {"rust", "cpp", "lua","python" }, -- Automatically install all supported parsers
+  highlight = {
+    enable = true,          -- Enable syntax highlighting
+    additional_vim_regex_highlighting = false, -- Use Tree-sitter instead of regex
+  },
+  indent = {
+    enable = true,          -- Enable Tree-sitter-based indentation
+  },
+}
+require'lspconfig'.rust_analyzer.setup {
+  settings = {
+    ["rust-analyzer"] = {
+      assist = { importGranularity = "module", importPrefix = "by_self" },
+      checkOnSave = { command = "clippy" },
+      diagnostics = { enable = true }
+    }
+  }
+}
+local lspconfig = require("lspconfig")
+
+lspconfig.pyright.setup({
+    on_attach = function(client, bufnr)
+        -- Enable keybindings and additional settings
+        local opts = { noremap = true, silent = true }
+        local buf_set_keymap = vim.api.nvim_buf_set_keymap
+
+        -- Example keybindings
+        buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+        buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+        buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+    end,
+    settings = {
+        python = {
+            analysis = {
+                typeCheckingMode = "off", -- Options: off, basic, strict
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = "workspace",
+            },
+        },
+    },
+})
+
+
+
+EOF
+map <C-n> :ToggleTerm<CR>
+nmap <F6> :TagbarToggle<CR>
+:colorscheme onedark
+let g:airline_theme='onedark'
+let g:NERDTreeDirArrowExpandable="+"
+let g:NERDTreeDirArrowCollapsible="~"
+nnoremap <C-f> :NERDTreeFocus<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-l> :UndotreeToggle<CR>
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
