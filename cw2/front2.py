@@ -2,7 +2,7 @@ from backfinal import SmartHome,SmartDoorBell,SmartLight,SmartPlug
 from tkinter import Tk, Frame,Label,Button,StringVar
 class Gui:
     buttons = {}
-    button_ids =[]
+    button_row =[]
     def __init__(self):
         self.win = Tk()
         self.win.title("SmartHome")
@@ -35,7 +35,8 @@ class Gui:
         self.strvar.set(self.smart_home)
 
     def remove_button(self,button_id):
-        self.buttons[button_id].destroy()
+        for button in self.buttons[button_id]:
+            button.destroy()
         del self.buttons[button_id] 
 
     def delete(self,device_index,button_id):
@@ -67,32 +68,30 @@ class Gui:
         turn_off.grid(row = 0, column = 3,ipadx = 75,columnspan = 2, sticky = 'we')
 
         for i in range(len(self.smart_home.device_list)):
-
-            toggle = Button(self.main_frame,
-                text="toggle",
-                command=lambda idx = i: self.toggle_device(idx) 
+            self.button_row = []
+            for j in range(len(self.smart_home.device_list)):
+                toggle = Button(self.main_frame,
+                    text="toggle",
+                    command=lambda idx = j: self.toggle_device(idx) 
                             )
-            toggle.id = f"toggle{i}"
-            self.buttons[toggle.id] = toggle
-            toggle.grid(row = 1+i  , column = 3,rowspan = 1,sticky = "we")
+            
+                self.button_row.append(toggle)
+                toggle.grid(row = 1+j  , column = 3,rowspan = 1,sticky = "we")
 
-            edit= Button(self.main_frame,
-                text="edit",
-                command=lambda idx = i: self.toggle_device(idx) #not done last thing need to add hardsest
+                edit= Button(self.main_frame,
+                    text="edit",
+                    command=lambda idx = j: self.toggle_device(idx) #not done last thing need to add hardsest
                             )
-            edit.id = f"edit{i}"
-            self.buttons[edit.id] = edit
-            edit.grid(row = 1+i  , column = 4,rowspan = 1,sticky = "we")
+                self.button_row.append(edit)
+                edit.grid(row = 1+j  , column = 4,rowspan = 1,sticky = "we")
 
-            delete= Button(self.main_frame,
-                text="delete",
-                command=lambda idx = i: self.delete(idx,f"delete{i}") 
+                delete= Button(self.main_frame,
+                    text="delete",
+                    command=lambda idx = j: self.delete(idx,j) 
                             )
-            delete.id = f"delete{i}"
-            print(delete.id)
-            self.buttons[delete.id] = delete
-            delete.grid(row = 1+i  , column = 5,rowspan = 1,padx = 10,sticky = "we")
-
+                self.button_row.append(delete)
+                delete.grid(row = 1+j  , column = 5,rowspan = 1,padx = 10,sticky = "we")
+            self.buttons[i] = self.button_row
         display = Label(
             self.main_frame,
             textvariable = self.strvar
