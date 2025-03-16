@@ -1,5 +1,6 @@
+from typing import Optional
 from backfinal import SmartHome,SmartDoorBell,SmartLight,SmartPlug
-from tkinter import Tk, Frame,Label,Button,StringVar
+from tkinter import Tk, Frame,Label,Button,StringVar,Toplevel,Entry,OptionMenu
 
 class SmartHomeApp:
     buttons = {}
@@ -23,7 +24,6 @@ class SmartHomeApp:
 
 
     def run(self):
-        #self.create_labels()
         self.create_buttons()
         self.win.mainloop()
 
@@ -60,7 +60,6 @@ class SmartHomeApp:
 
     def remove_btns(self,device_id):
         if device_id in self.buttons:
-            print(self.buttons[device_id])
             for btn in self.buttons[device_id]:
                 btn.destroy()
         self.buttons.pop(device_id)
@@ -70,13 +69,146 @@ class SmartHomeApp:
             self.labels[device_id].destroy()
             self.labels.pop(device_id)
 
-    def create_labels(self):
-        for i , items in enumerate(self.smart_home.device_list):
-            devices = Label(
-                self.main_frame,
-                text= f"{i+1}: {str(items)}"
+    def edit_btn(self,device_id):
+        device = next((d for d in self.smart_home.device_list if id(d) == device_id), None)
+        if device:
+            edit_window = Toplevel(self.win)
+            edit_window.title("Edit Device")
+        
+        # Check which attribute of the device
+            if isinstance(device, SmartPlug):
+                current_value = device.option  #current consumption rate
+                label = Label(edit_window, 
+                              text="consumption rate:"
+                              )
+                entry = Entry(edit_window)
+                entry.insert(0, str(current_value))  #puts number in front
+
+            elif isinstance(device, SmartLight):
+                current_value = device.option  #the current brightness
+                label = Label(edit_window, text="Set Brightness:")
+                entry = Entry(edit_window)
+                entry.insert(0, str(current_value))  
+
+            elif isinstance(device, SmartDoorBell):
+                current_value = device.sleep_mode  #current sleep mode status
+                label = Label(edit_window, text="Set Sleep Mode (True/False):")
+                entry = Entry(edit_window)
+                entry.insert(0, str(current_value))  
+
+        # Layout
+            label.grid(row=0, column=0)
+            entry.grid(row=0, column=1)
+
+        # Save button to update the attribute
+            def save_changes():
+                try:
+                    new_value = entry.get()
+                    if isinstance(device, SmartPlug):
+                        new_value = int(new_value)
+                        device.option = new_value  # Update the consumption rate
+                    elif isinstance(device, SmartLight):
+                        new_value = int(new_value)
+                        device.option = new_value  # Update the brightness
+                    elif isinstance(device, SmartDoorBell):
+                        new_value = new_value.lower() == 'true'  # Convert to boolean
+                        device.sleep_mode = new_value  # Update sleep mode
+
+                # Update the device label after editing
+                    self.update_labels()
+                    self.create_buttons()
+
+                # Close the edit window
+                    
+                    edit_window.destroy()
+
+                except (ValueError, TypeError) as e:
+                    error_window= Toplevel(self.win)
+                    error_window.title("Error")
+                    label = Label(error_window,text=f"error: {e}")
+                    label.grid()
+                    button = Button(error_window,
+                                    text= "ok",
+                                    command=error_window.destroy
+                                    )
+                    button.grid()
+
+            save_btn = Button(edit_window, text="Save", command=save_changes)
+            save_btn.grid(row=1, column=0, columnspan=2)
+
+
+    def add_btn(self):
+        add_window = Toplevel(self.win)
+        add_window.title("add device")
+
+        label = Label(add_window,
+                      text= "choose device"
+                      )
+        label.grid(row=0,column=0)
+        device_var = StringVar(add_window)
+        device_var.set("SmartDoorBell")  # Default selection
+        options = ["SmartDoorBell", "SmartLight", "SmartPlug"]
+        dropdown = OptionMenu(add_window, device_var, *options)
+        dropdown.grid(row=0, column=1)
+
+        entry = Entry(add_window)
+        entry.grid(row = 1, column= 1)
+        
+        optional_lable = Label(
+            add_window,
+            text="Optional amount"
             )
-            devices.grid(row = 1,column= 0,columnspan=2,rowspan=row,sticky= "nesw")
+        optional_lable.grid(row=1,column=0)
+
+        def add_device(device_name, value):
+            new_device = None
+            value = value.get().strip()  # Get the value from the Entry widget
+    
+    # Try to convert the value to an integer, handle invalid input
+            try:
+                value = int(value) if value else None
+            except ValueError:
+                error_win = Toplevel(add_window)
+                Label(error_win, text="Invalid number!").pack()
+                Button(error_win, text="OK", command=error_win.destroy).pack()
+                return  # Stop execution if the input is invalid
+
+            match device_name:
+                case "SmartDoorBell":
+                    new_device = SmartDoorBell()  # Initialize the SmartDoorBell
+                    if value is not None:
+                        pass  # You can set some attribute of SmartDoorBell here if needed
+                case "SmartLight":
+                    new_device = SmartLight()  # Initialize the SmartLight
+                    if value is not None:
+                        new_device.option = value  # Set the option (e.g., brightness)
+                case "SmartPlug":
+                    new_device = SmartPlug(value if value is not None else 100)  # Initialize with value or default to 100
+                    if value is not None:
+                        new_device.option = value  # Set the option (e.g., power consumption)
+
+    # Add the device to the smart home
+            print(self.smart_home.device_list)
+            print()
+            self.smart_home.add_device(new_device)
+            print(self.smart_home.device_list)
+    
+    # Update the labels on the screen
+            self.update_labels()
+    
+    # Close the add window
+            add_window.destroy()
+
+# Button with lambda to pass the device name and entry value
+        button = Button(add_window,
+                text="OK",
+                command=lambda: add_device(device_var.get(), entry))  # Pass the entry widget to get value
+        button.grid(row=2, columnspan=2, sticky="nesw")
+
+                            
+
+
+
 
     def create_buttons(self):
         turn_on_btn = Button(
@@ -94,8 +226,6 @@ class SmartHomeApp:
 
         for i , items in enumerate(self.smart_home.device_list):
             device_id = id(items)
-            buttons_row = []
-            print(buttons_row)
             toggle_btn = Button(
                 self.main_frame,
                 text = "toggle",
@@ -111,7 +241,7 @@ class SmartHomeApp:
             edit_btn = Button(
                 self.main_frame,
                 text = "edit",
-                command= lambda id = device_id :self.delete_btn(id)
+                command= lambda id = device_id :self.edit_btn(id)
                 )
             edit_btn.grid(row=1+i,column=3)
 
@@ -120,12 +250,14 @@ class SmartHomeApp:
                 text= f"{i+1}: {str(items)}"
             )
             devices.grid(row = i+1,column= 0,columnspan=2,sticky= "nesw")
-            buttons_row.append(toggle_btn)
-            buttons_row.append(delete_btn)
-            print(buttons_row)
             self.buttons[device_id] = [toggle_btn,delete_btn,edit_btn]
             self.labels[device_id] = devices
-            print(self.buttons)
+        add_btn = Button(
+                self.main_frame,
+                text = "add",
+                command= self.add_btn
+                )
+        add_btn.grid()
             
 
         
