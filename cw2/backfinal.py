@@ -29,7 +29,7 @@ class SmartDevices:
 
     @option.setter
     def option(self,new_value):
-        if not isinstance(new_value,int):
+        if not isinstance(new_value,int) or isinstance(new_value,bool):
             raise TypeError(f"cant execpt value needs to be type int")
         if not (self.min_val <= new_value <= self.max_val):
             raise ValueError(f"cant execpt value needs to be between {self.min_val} and {self.max_val} is {new_value}")
@@ -141,7 +141,7 @@ def test():
 
 def testhome():
     home = SmartHome()
-    plug = SmartPlug(100)
+    plug = SmartPlug(True)
     light = SmartLight()
     light.switch_on = True
     doorbell = SmartDoorBell()
@@ -167,7 +167,6 @@ def testhome():
      #   home.toggle_device(1)
 
       #  home.switch_all_off() 
-
        # home.get_device(1)   # off
 
         #home.toggle_device(1) 

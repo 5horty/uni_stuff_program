@@ -1,10 +1,10 @@
-from typing import Optional
 from backfinal import SmartHome,SmartDoorBell,SmartLight,SmartPlug
 from tkinter import Tk, Frame,Label,Button,StringVar,Toplevel,Entry,OptionMenu
 
 class SmartHomeApp:
     buttons = {}
     labels ={}
+    add_btn_list =[]
 
     def __init__(self):
         self.win = Tk()
@@ -160,57 +160,106 @@ class SmartHomeApp:
             )
         optional_lable.grid(row=1,column=0)
 
-        def add_device(device_name, value):
+        def add_device():
+            device_name = device_var.get()
+            value = entry.get().strip()  # Get input and remove leading/trailing spaces
             new_device = None
-            value = value.get().strip()  # Get the value from the Entry widget
-    
-    # Try to convert the value to an integer, handle invalid input
-            try:
-                value = int(value) if value else None
-            except ValueError:
-                error_win = Toplevel(add_window)
-                Label(error_win, text="Invalid number!").pack()
-                Button(error_win, text="OK", command=error_win.destroy).pack()
-                return  # Stop execution if the input is invalid
 
-            match device_name:
-                case "SmartDoorBell":
-                    new_device = SmartDoorBell()  # Initialize the SmartDoorBell
-                    if value is not None:
-                        pass  # You can set some attribute of SmartDoorBell here if needed
-                case "SmartLight":
-                    new_device = SmartLight()  # Initialize the SmartLight
-                    if value is not None:
-                        new_device.option = value  # Set the option (e.g., brightness)
-                case "SmartPlug":
-                    new_device = SmartPlug(value if value is not None else 100)  # Initialize with value or default to 100
-                    if value is not None:
-                        new_device.option = value  # Set the option (e.g., power consumption)
-
-    # Add the device to the smart home
-            print(self.smart_home.device_list)
-            print()
-            self.smart_home.add_device(new_device)
-            print(self.smart_home.device_list)
-    
-    # Update the labels on the screen
-            self.update_labels()
-    
-    # Close the add window
-            add_window.destroy()
-
-# Button with lambda to pass the device name and entry value
-        button = Button(add_window,
-                text="OK",
-                command=lambda: add_device(device_var.get(), entry))  # Pass the entry widget to get value
-        button.grid(row=2, columnspan=2, sticky="nesw")
-
-                            
+            if device_name == "SmartDoorBell":
+                new_device = SmartDoorBell()  # No option attribute needed
+                if value:
+                    try:
+                        if value.strip().lower() == "false" :
+                            new_device.sleep_mode = False
+                        elif value.strip().lower() == "true":
+                            new_device.sleep_mode = True
+                    except (TypeError,ValueError) as e:
+                        error_win = Toplevel(self.main_frame)
+                        error_win.title("error")
+                        label = Label(
+                            error_win,
+                            text = f"{e}"
+                        )
+                        label.grid()
+                        button = Button(
+                            error_win,
+                            text= "ok",
+                            command= lambda: error_win.destroy()
+                        )
+                        button.grid()
+                        print(value)
+                        return
 
 
+            elif device_name == "SmartLight":
+                new_device = SmartLight()  # No option attribute needed
+                if value:
+                    try:
+                        new_device.option = int(value)
+                    except ValueError as e:
+                        error_win = Toplevel(self.main_frame)
+                        error_win.title("error")
+                        label = Label(
+                            error_win,
+                            text = f"{e}"
+                        )
+                        label.grid()
+                        button = Button(
+                            error_win,
+                            text= "ok",
+                            command= lambda: error_win.destroy()
+                        )
+                        button.grid()
+                        return
 
+            elif device_name == "SmartPlug":
+                try:
+                    new_device = SmartPlug(int(value)) if value else SmartPlug(100)  # Default 100 if empty
+                except ValueError as e:
+                    error_win = Toplevel(add_window)
+                    Label(error_win,
+                          text=f"{e}").pack()
+                    Button(error_win,
+                           text="OK", 
+                           command=error_win.destroy).pack()
+                    return  # Stop execution if invalid input
+
+            if new_device:
+                try:
+                    self.smart_home.add_device(new_device)
+                except IndexError as e:
+                        error_win = Toplevel(self.main_frame)
+                        error_win.title("error")
+                        label = Label(
+                            error_win,
+                            text = f"{e}"
+                        )
+                        label.grid()
+                        button = Button(
+                            error_win,
+                            text= "ok",
+                            command= lambda: error_win.destroy()
+                        )
+                        button.grid()
+                        return
+
+                self.create_buttons()  # Update UI
+
+            add_window.destroy()  # Close the window
+
+    # Button to confirm adding the device
+        Button(add_window, text="Add", command=add_device).grid(row=2, column=0, columnspan=2, sticky="nesw")
 
     def create_buttons(self):
+        for btn in self.add_btn_list:
+            btn.destroy()
+
+        for button_list in self.buttons.values():
+            for button in button_list:
+                button.destroy()
+        for label in self.labels.values():
+            label.destroy()
+
         turn_on_btn = Button(
             self.main_frame,
             text = "turn on all",
@@ -258,6 +307,8 @@ class SmartHomeApp:
                 command= self.add_btn
                 )
         add_btn.grid()
+        self.add_btn_list.append(add_btn)
+
             
 
         
