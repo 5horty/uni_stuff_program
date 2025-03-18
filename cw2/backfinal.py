@@ -1,3 +1,7 @@
+import os
+import json
+from re import I
+
 class SmartDevices:
     def __init__(self,*args):
         if len(args) > 2:
@@ -15,7 +19,7 @@ class SmartDevices:
     @switch_on.setter
     def switch_on(self,new_value):
         if not isinstance(new_value,bool):
-            raise TypeError("wrong type buddy")
+            raise TypeError("error wrong type was entered")
         else:
             self._switch_on = new_value
             if self._switch_on: 
@@ -57,7 +61,7 @@ class SmartLight(SmartDevices):
         super().__init__(self._brightness,self.min,self.max)
 
     def __str__(self):
-        return f"SmartLight is {self.power} with a consumption rate of {self.option}"
+        return f"SmartLight is {self.power} with a brightness of {self.option}"
 
 class SmartDoorBell(SmartDevices):
     def __init__(self):
@@ -71,7 +75,7 @@ class SmartDoorBell(SmartDevices):
     @sleep_mode.setter
     def sleep_mode(self,new_value):
         if not isinstance(new_value,bool):
-            raise TypeError("not today buddy")
+            raise TypeError("error please enter a valid setting")
         else:
             self._sleep_mode = new_value
          
@@ -90,7 +94,7 @@ class SmartHome:
         if len(self.device_list) < 10:
             self.device_list.append(new_device)
         else:
-            raise IndexError("too many items")
+            raise IndexError("limit is exceeded too many devices")
     
     def remove_device(self,index):
         if (index <= 10) and (index >= 0):
@@ -105,8 +109,6 @@ class SmartHome:
             self.device_list[index].sleep_mode = value
         elif hasattr(self.device_list[index],"option"):
             self.device_list[index].option = value
-        else:
-            raise AttributeError("not an attribute")
 
     def get_device(self,index):
         return self.device_list[index]
@@ -128,62 +130,162 @@ class SmartHome:
             output += f"{index+1}  {self.device_list[index]}  \n" 
         return output
 
-def test():
-    try:
-        plug = SmartDoorBell()
-        print(plug)
-        plug.toggle_switch()
-        plug.sleep_mode = True
-        print(plug)
-    except (ValueError,TypeError) as error:
-        print(f"ik here is error: {error}")
+#chal not working
 
 
-def testhome():
-    home = SmartHome()
-    plug = SmartPlug(True)
-    light = SmartLight()
-    light.switch_on = True
+class SmartHomesApp:
+    def __init__(self,file_name = "Smart_home.json"):
+        self.file_name = file_name
+        self.homes = self.load_homes()
+
+
+    def load_homes(self):
+        if not os.path.exists(self.file_name):
+            with open(self.file_name,"w") as file:
+                json.dump({},file)
+            return {}
+        try:
+            with open(self.file_name,"r") as file:
+                return json.load(file)
+        except (json.JSONDecodeError,FileNotFoundError) as e:
+            return {}
+
+    def save_homes(self):
+        with open(self.file_name,"w") as file:
+            json.dump(self.homes,file)
+
+
+    def add_home(self,home):
+        self.homes[len(self.homes.keys())+1] = {"devices":[
+                {"type": device.__class__.__name__,"attr":device.__dict__} for device in home.device_list]}
+        self.save_homes()
+
+    def remove_home(self, index):
+        if index not in self.homes:
+            raise ValueError("Home not found.")
+        del self.homes[index]
+        self.save_homes()
+
+    def list_homes(self):
+        return list(self.homes.keys())
+
+    def get_home(self, index):
+        if index not in self.homes:
+            raise ValueError("Home not found.")
+        return self.homes[index]
+
+def test_smart_plug():
+    plug = SmartPlug(45)
+    print(plug)
+    plug.toggle_switch()
+    print(plug)
+    plug.option = 75 
+    plug.toggle_switch()
+    print(plug)
+    for i in [-10,200]:
+        try:
+            plug.option = i
+        except ValueError as e:
+            print(f"{e}")
+
+    for j in [-5,160]:
+        try:
+            plug2 = SmartPlug(j)
+        except ValueError as e:
+            print(f"{e}")
+
+def test_custom_device():
     doorbell = SmartDoorBell()
+    light = SmartLight()
+
+    print(light)
+    print(doorbell)
+
+    doorbell.toggle_switch()
+    light.toggle_switch()
+
+    print(light)
+    print(doorbell)
+
+    doorbell.sleep_mode = True
+    light.option = 69
+
+    print(light)
+    print(doorbell)
+    
     try:
-        home.add_device(plug)
-        home.add_device(light)
-        home.add_device(doorbell)
-        print(home)
+        doorbell.sleep_mode = 69420
+    except (ValueError,TypeError) as e:
+        print(f"{e}")
 
+    try:
+        light.option = 42069
+    except (ValueError,TypeError) as e:
+        print(f"{e}")
 
-#        home.get_device(1) #off
+def test_smart_home():
+    plug = SmartPlug(45)
+    light = SmartLight()
+    doorbell = SmartDoorBell()
 
-        home.toggle_device(1) 
+    home = SmartHome()
+    home.add_device(plug)
+    home.add_device(light)
+    home.add_device(doorbell)
 
-        home.get_device(1) #on
+    print(home)
 
-   #     home.switch_all_on() 
+    print(home.get_device(1))
 
-   #     home.toggle_device(1) 
+    home.toggle_device(0)
+    home.toggle_device(1)
+    home.toggle_device(2)
 
-    #    home.get_device(1) #off
+    print(home)
 
-     #   home.toggle_device(1)
+    home.switch_all_on()
+    print(home)
+    home.switch_all_off()
+    print(home)
 
-      #  home.switch_all_off() 
-       # home.get_device(1)   # off
+    try:
+        for i in range(69):
+            device = SmartDoorBell()
+            home.add_device(device)
+    except IndexError as e:
+        print(f"{e}")
 
-        #home.toggle_device(1) 
+    home.device_list = []
 
-        #home.get_device(1)  #on
+    home.add_device(plug)
+    home.add_device(light)
+    home.add_device(doorbell)
+    
+    home.remove_device(0)
+    print(home)
+    for i in [-1,69]:
+        try:
+            home.remove_device(i)
+        except (IndexError) as e:
+            print(f"{e}")
 
-        #home.update_option(0,75)
-        #home.update_option(2,True)
+    home.update_option(0,100)
+    home.update_option(1,True)
 
-        print(home)
-    except (TypeError,ValueError,IndexError,AttributeError) as error:
-        print(f"error=> {error}")
+    print(home)
+
+    for i in range(2):
+        try:
+            home.update_option(i,42069)
+        except (ValueError,TypeError) as e:
+            print(f"{e}")
+
+    print(home)
+
 
 if __name__ == "__main__":
-    testhome()
-
-
-
-
+    pass
+#test_custom_device()
+#test_smart_home()
+#test_smart_plug()
 
