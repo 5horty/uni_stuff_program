@@ -9,18 +9,17 @@ class SmartHomeApp:
     def __init__(self):
         self.win = Tk()
         self.win.title("SmartHome")
-        self.win.geometry("2000x500")
-        self.win.minsize(1200,400)
+        self.win.geometry("1200x620")
+        self.win.minsize(1200,620)
+        self.win.maxsize(1200,620)
         self.main_frame = Frame(self.win)
         self.main_frame.pack()
-        self.strvar = StringVar()
 
         self.smart_home = SmartHome()
         self.smart_home.add_device(SmartDoorBell())
         self.smart_home.add_device(SmartLight())
         self.smart_home.add_device(SmartPlug(100))
 
-        self.strvar.set(str(self.smart_home))
 
 
     def run(self):
@@ -34,6 +33,7 @@ class SmartHomeApp:
                 device = self.smart_home.device_list[index]
                 text = f"{index+1}: {str(device)}"
                 item.config(text = text)
+        self.main_frame.update()
 
     def turn_on_all(self):
         self.smart_home.switch_all_on()
@@ -74,6 +74,7 @@ class SmartHomeApp:
         if device:
             edit_window = Toplevel(self.win)
             edit_window.title("Edit Device")
+            edit_window.minsize(400,500)
         
         # Check which attribute of the device
             if isinstance(device, SmartPlug):
@@ -100,10 +101,9 @@ class SmartHomeApp:
             label.grid(row=0, column=0)
             entry.grid(row=0, column=1)
 
-        # Save button to update the attribute
             def save_changes():
                 try:
-                    new_value = entry.get()
+                    new_value = entry.get().strip()
                     if isinstance(device, SmartPlug):
                         new_value = int(new_value)
                         device.option = new_value  # Update the consumption rate
@@ -111,8 +111,12 @@ class SmartHomeApp:
                         new_value = int(new_value)
                         device.option = new_value  # Update the brightness
                     elif isinstance(device, SmartDoorBell):
-                        new_value = new_value.lower() == 'true'  # Convert to boolean
-                        device.sleep_mode = new_value  # Update sleep mode
+                        if new_value.capitalize() == "True":
+                            device.sleep_mode = bool(new_value)
+                        elif new_value.capitalize() == "False":
+                            device.sleep_mode = False
+                        else:
+                            device.sleep_mode = 69420
 
                 # Update the device label after editing
                     self.update_labels()
@@ -302,7 +306,7 @@ class SmartHomeApp:
             self.buttons[device_id] = [toggle_btn,delete_btn,edit_btn]
             self.labels[device_id] = devices
         add_btn = Button(
-                self.main_frame,
+            self.main_frame,
                 text = "add",
                 command= self.add_btn
                 )
@@ -314,7 +318,7 @@ class SmartHomeApp:
         
 
 
-
+        
 
 
 
