@@ -33,10 +33,11 @@ class SmartDevices:
 
     @option.setter
     def option(self,new_value):
-        if not isinstance(new_value,int) or isinstance(new_value,bool):
+        if not isinstance(new_value,(int,bool,str)):
             raise TypeError(f"cant execpt value needs to be type int")
         if not (self.min_val <= new_value <= self.max_val):
-            raise ValueError(f"cant execpt value needs to be between {self.min_val} and {self.max_val} is {new_value}")
+            raise ValueError(f"cant execpt value needs to be between" 
+                        + f"{self.min_val} and {self.max_val} is {new_value}")
         self._option = new_value
 
     def toggle_switch(self):
@@ -51,7 +52,9 @@ class SmartPlug(SmartDevices):
         super().__init__(consumption_rate,self.min,self.max)
 
     def __str__(self):
-        return f"SmartPlug is {self.power} with a consumption rate of {self.option}"
+        output = f"SmartPlug is {self.power}" 
+        output += f" with a consumption rate of {self.option}"
+        return output
 
 class SmartLight(SmartDevices):
     def __init__(self):
@@ -157,7 +160,8 @@ class SmartHomesApp:
 
     def add_home(self,home):
         self.homes[len(self.homes.keys())+1] = {"devices":[
-                {"type": device.__class__.__name__,"attr":device.__dict__} for device in home.device_list]}
+        {"type": device.__class__.__name__,"attr":device.__dict__}  
+        for device in home.device_list]}
         self.save_homes()
 
     def remove_home(self, index):

@@ -28,7 +28,8 @@ class SmartHomeApp:
 
     def update_labels(self):
         for device_id, item in self.labels.items():
-            index = next((i for i, d in enumerate(self.smart_home.device_list) if id(d) == device_id),None)
+            index = next((i for i, d in enumerate(self.smart_home.device_list)
+                if id(d) == device_id),None)
             if index is not None:
                 device = self.smart_home.device_list[index]
                 text = f"{index+1}: {str(device)}"
@@ -45,13 +46,15 @@ class SmartHomeApp:
 
 
     def toggle_btn(self,device_id):
-        index = next((i for i, d in enumerate(self.smart_home.device_list) if id(d) == device_id),None)
+        index = next((i for i, d in enumerate(self.smart_home.device_list)
+            if id(d) == device_id),None)
         if index is not None:
             self.smart_home.device_list[index].toggle_switch()
             self.update_labels()
 
     def delete_btn(self,device_id):
-        index = next((i for i, d in enumerate(self.smart_home.device_list) if id(d) == device_id),None)
+        index = next((i for i, d in enumerate(self.smart_home.device_list)
+            if id(d) == device_id),None)
         if index is not None:
             self.smart_home.remove_device(index)
             self.remove_labels(device_id)
@@ -70,7 +73,8 @@ class SmartHomeApp:
             self.labels.pop(device_id)
 
     def edit_btn(self,device_id):
-        device = next((d for d in self.smart_home.device_list if id(d) == device_id), None)
+        device = next((d for d in self.smart_home.device_list 
+            if id(d)== device_id), None)
         if device:
             edit_window = Toplevel(self.win)
             edit_window.title("Edit Device")
@@ -150,7 +154,7 @@ class SmartHomeApp:
                       )
         label.grid(row=0,column=0)
         device_var = StringVar(add_window)
-        device_var.set("SmartDoorBell")  # Default selection
+        device_var.set("SmartDoorBell")  #default selection
         options = ["SmartDoorBell", "SmartLight", "SmartPlug"]
         dropdown = OptionMenu(add_window, device_var, *options)
         dropdown.grid(row=0, column=1)
@@ -166,11 +170,11 @@ class SmartHomeApp:
 
         def add_device():
             device_name = device_var.get()
-            value = entry.get().strip()  # Get input and remove leading/trailing spaces
+            value = entry.get().strip()  
             new_device = None
 
             if device_name == "SmartDoorBell":
-                new_device = SmartDoorBell()  # No option attribute needed
+                new_device = SmartDoorBell()  
                 if value:
                     try:
                         if value.strip().lower() == "false" :
@@ -196,11 +200,11 @@ class SmartHomeApp:
 
 
             elif device_name == "SmartLight":
-                new_device = SmartLight()  # No option attribute needed
+                new_device = SmartLight()  
                 if value:
                     try:
                         new_device.option = int(value)
-                    except ValueError as e:
+                    except (ValueError,TypeError) as e:
                         error_win = Toplevel(self.main_frame)
                         error_win.title("error")
                         label = Label(
@@ -218,7 +222,10 @@ class SmartHomeApp:
 
             elif device_name == "SmartPlug":
                 try:
-                    new_device = SmartPlug(int(value)) if value else SmartPlug(100)  # Default 100 if empty
+                    if value:
+                        new_device = SmartPlug(int(value)) 
+                    else:
+                        SmartPlug(100)  # Default 100 if empty
                 except ValueError as e:
                     error_win = Toplevel(add_window)
                     Label(error_win,
@@ -252,7 +259,8 @@ class SmartHomeApp:
             add_window.destroy()  # Close the window
 
     # Button to confirm adding the device
-        Button(add_window, text="Add", command=add_device).grid(row=2, column=0, columnspan=2, sticky="nesw")
+        butn = Button(add_window, text="Add", command=add_device)
+        butn.grid(row=2, column=0, columnspan=2, sticky="nesw")
 
     def create_buttons(self):
         for btn in self.add_btn_list:
