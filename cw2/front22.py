@@ -1,4 +1,3 @@
-from os import error
 from backfinal import SmartHome,SmartDoorBell,SmartLight,SmartPlug
 from tkinter import Tk, Frame,Label,Button,StringVar,Toplevel,Entry,OptionMenu
 
@@ -19,7 +18,7 @@ class SmartHomeApp:
         self.smart_home = SmartHome()
         self.smart_home.add_device(SmartDoorBell())
         self.smart_home.add_device(SmartLight())
-        self.smart_home.add_device(SmartPlug(100))
+        self.smart_home.add_device(SmartPlug(45))
 
 
 
@@ -132,15 +131,7 @@ class SmartHomeApp:
                     edit_window.destroy()
 
                 except (ValueError, TypeError) as e:
-                    error_window= Toplevel(self.win)
-                    error_window.title("Error")
-                    label = Label(error_window,text=f"error: {e}")
-                    label.grid()
-                    button = Button(error_window,
-                                    text= "ok",
-                                    command=error_window.destroy
-                                    )
-                    button.grid()
+                    self.error_window(e)
 
             save_btn = Button(edit_window, text="Save", command=save_changes)
             save_btn.grid(row=1, column=0, columnspan=2)
@@ -184,20 +175,7 @@ class SmartHomeApp:
                         elif value.strip().lower() == "true":
                             new_device.sleep_mode = True
                     except (TypeError,ValueError) as e:
-                        error_win = Toplevel(self.main_frame)
-                        error_win.title("error")
-                        label = Label(
-                            error_win,
-                            text = f"{e}"
-                        )
-                        label.grid()
-                        button = Button(
-                            error_win,
-                            text= "ok",
-                            command= lambda: error_win.destroy()
-                        )
-                        button.grid()
-                        print(value)
+                        self.error_window(e)
                         return
 
 
@@ -207,19 +185,7 @@ class SmartHomeApp:
                     try:
                         new_device.option = int(value)
                     except (ValueError,TypeError) as e:
-                        error_win = Toplevel(self.main_frame)
-                        error_win.title("error")
-                        label = Label(
-                            error_win,
-                            text = f"{e}"
-                        )
-                        label.grid()
-                        button = Button(
-                            error_win,
-                            text= "ok",
-                            command= lambda: error_win.destroy()
-                        )
-                        button.grid()
+                        self.error_window(e)
                         return
 
             elif device_name == "SmartPlug":
@@ -227,42 +193,41 @@ class SmartHomeApp:
                     if value:
                         new_device = SmartPlug(int(value)) 
                     else:
-                        SmartPlug(100)  # Default 100 if empty
+                        new_device = SmartPlug(45)  
                 except ValueError as e:
-                    error_win = Toplevel(add_window)
-                    Label(error_win,
-                          text=f"{e}").pack()
-                    Button(error_win,
-                           text="OK", 
-                           command=error_win.destroy).pack()
-                    return  # Stop execution if invalid input
+                    self.error_window(e)
+                    return  
 
             if new_device:
                 try:
                     self.smart_home.add_device(new_device)
                 except IndexError as e:
-                        error_win = Toplevel(self.main_frame)
-                        error_win.title("error")
-                        label = Label(
-                            error_win,
-                            text = f"{e}"
-                        )
-                        label.grid()
-                        button = Button(
-                            error_win,
-                            text= "ok",
-                            command= lambda: error_win.destroy()
-                        )
-                        button.grid()
-                        return
+                    self.error_window(e)
+                    return
 
-                self.create_widgets()  # Update UI
 
-            add_window.destroy()  # Close the window
+                self.create_widgets()  # update UI
 
-    # Button to confirm adding the device
+            add_window.destroy()  
+
         butn = Button(add_window, text="Add", command=add_device)
         butn.grid(row=2, column=0, columnspan=2, sticky="nesw")
+
+    def error_window(self,msg):
+        error_win = Toplevel(self.main_frame)
+        error_win.title("Error")
+        label = Label(
+            error_win,
+            text = msg
+        )
+        label.grid()
+        btn = Button(
+            error_win,
+            text="ok",
+                command=lambda: error_win.destroy()
+            )
+        btn.grid()
+
 
     def create_widgets(self):
         for btn in self.add_btn_list:
@@ -329,7 +294,12 @@ class SmartHomeApp:
 
 
         
+def test_smart_home_system():
+    t = SmartHomeApp()
+    print(t.smart_home.device_list)
+    t.run()
 
+test_smart_home_system()
 
 
 
@@ -341,4 +311,3 @@ def run():
     t = SmartHomeApp()
     t.run()
 
-run()
