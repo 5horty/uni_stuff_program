@@ -165,7 +165,7 @@ class SmartHomesApp:
 
     def remove_home(self, index):
         if index not in self.homes:
-            raise ValueError("Home not found.")
+            raise ValueError("home not found")
         del self.homes[index]
         self.save_homes()
 
@@ -174,7 +174,7 @@ class SmartHomesApp:
 
     def get_home(self, index):
         if index not in self.homes:
-            raise ValueError("Home not found.")
+            raise ValueError("Home not found")
         return self.homes[index]
 
 def test_smart_plug():
@@ -287,8 +287,7 @@ def test_smart_home():
 
 
 if __name__ == "__main__":
-    pass
-#test_custom_device()
-#test_smart_home()
-#test_smart_plug()
+    test_custom_device()
+    test_smart_home()
+    test_smart_plug()
 
