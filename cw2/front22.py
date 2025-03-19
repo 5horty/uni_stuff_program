@@ -1,3 +1,4 @@
+from os import error
 from backfinal import SmartHome,SmartDoorBell,SmartLight,SmartPlug
 from tkinter import Tk, Frame,Label,Button,StringVar,Toplevel,Entry,OptionMenu
 
@@ -23,7 +24,7 @@ class SmartHomeApp:
 
 
     def run(self):
-        self.create_buttons()
+        self.create_widgets()
         self.win.mainloop()
 
     def update_labels(self):
@@ -78,7 +79,7 @@ class SmartHomeApp:
         if device:
             edit_window = Toplevel(self.win)
             edit_window.title("Edit Device")
-            edit_window.minsize(400,500)
+            edit_window.minsize(520,150)
         
         # Check which attribute of the device
             if isinstance(device, SmartPlug):
@@ -124,7 +125,7 @@ class SmartHomeApp:
 
                 # Update the device label after editing
                     self.update_labels()
-                    self.create_buttons()
+                    self.create_widgets()
 
                 # Close the edit window
                     
@@ -148,6 +149,7 @@ class SmartHomeApp:
     def add_btn(self):
         add_window = Toplevel(self.win)
         add_window.title("add device")
+        add_window.minsize(500,150)
 
         label = Label(add_window,
                       text= "choose device"
@@ -254,7 +256,7 @@ class SmartHomeApp:
                         button.grid()
                         return
 
-                self.create_buttons()  # Update UI
+                self.create_widgets()  # Update UI
 
             add_window.destroy()  # Close the window
 
@@ -262,7 +264,7 @@ class SmartHomeApp:
         butn = Button(add_window, text="Add", command=add_device)
         butn.grid(row=2, column=0, columnspan=2, sticky="nesw")
 
-    def create_buttons(self):
+    def create_widgets(self):
         for btn in self.add_btn_list:
             btn.destroy()
 

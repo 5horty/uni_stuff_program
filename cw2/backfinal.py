@@ -1,6 +1,5 @@
 import os
 import json
-from re import I
 
 class SmartDevices:
     def __init__(self,*args):
